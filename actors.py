@@ -28,6 +28,9 @@ class Game(object):
                 self.ids += 1
         self.players[0].toggle_turn()
 
+    def next(self):
+        self.next_player_turn()
+
     def next_player_turn(self):
         self.players[self.current_turn].toggle_turn()
         self.current_turn = (self.current_turn + 1) % len(self.players)

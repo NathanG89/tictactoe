@@ -50,6 +50,10 @@ class Column(object):
     def __setitem__(self, key, value):
         self.items[key] = value
 
+    def is_filled(self):
+        symbols = set([item.value for item in self.items])
+        return len(symbols) == 1 and None not in symbols
+
 class Grid(Column):
     def __repr__(self):
         return '<Grid %r>' % (self.items,)
@@ -58,6 +62,23 @@ class Grid(Column):
         for x in range(self.size):
             for y in range(self.size):
                 yield self[x][y]
+
+    def has_three_in_a_row(self):
+        # verticals
+        for col in self.items:
+            if col.is_filled():
+                return True
+        # horizontals
+        for row in [[col[i] for col in self.items] for i in range(self.size)]:
+            symbols = set([item.value for item in row])
+            if len(symbols) == 1 and None not in symbols:
+                return True
+        # diagonals
+        for diagonal in [[item[i] for i, item in enumerate(self.items)], [item[i] for i, item in enumerate(self.items[::-1])]]:
+            symbols = set([item.value for item in diagonal])
+            if len(symbols) == 1 and None not in symbols:
+                return True
+
 
 class Board(object):
     """Uses everything else so far to create a default board. Call

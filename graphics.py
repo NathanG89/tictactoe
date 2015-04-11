@@ -1,6 +1,7 @@
 #!/usr/bin/python
-from sys import exit
+from sys import exit as sysexit
 import pygame
+from time import sleep
 from random import randint
 from board import Square, Grid, Column
 from actors import Player, Game
@@ -8,12 +9,13 @@ from actors import Player, Game
 pygame.init()
 
 WIDTH, HEIGHT = 640, 640
-SIZE = 7
+SIZE = 3
 DISPLAY_SURF = pygame.display.set_mode((WIDTH,HEIGHT))
 
 FONTOBJ = pygame.font.Font('lato.ttf', 48)
 
-players = Player(0, 'X'), Player(1, 'O'), Player(2, 'W'), Player(3, 'H')
+#players = Player(0, 'X'), Player(1, 'O'), Player(2, 'W'), Player(3, 'H')
+players = Player(0, 'X'), Player(1, 'O')
 
 white = 204, 204, 204
 black = 54, 54, 54 
@@ -43,8 +45,20 @@ class Tile(Square):
 
 def create_graphic_board(size=SIZE):
     return Grid([Column([Tile(DISPLAY_SURF, x,y) for y in range(size)]) for x in range(size)])
-board = create_graphic_board(SIZE)
 
+def message(s):
+    msg = FONTOBJ.render(s, True, white, black)
+    DISPLAY_SURF.blit(msg, msg.get_rect())
+
+def exit(s):
+    for tile in board:
+        tile.draw()
+    message(s)
+    pygame.display.update()
+    sleep(3)
+    sysexit()
+
+board = create_graphic_board(SIZE)
 clock = pygame.time.Clock()
 game = Game(players)
 
@@ -56,11 +70,13 @@ while True:
             for tile in board:
                 if tile.is_clicked():
                     tile.value = game.players[game.current_turn].symbol
-                    game.next_player_turn()
+                    if board.has_three_in_a_row():
+                        #print 'game over, player %d won' % game.current_turn
+                        exit('game over, player %d won' % game.current_turn)
+                    game.next()
     DISPLAY_SURF.fill(black)
     for tile in board:
         tile.draw()
-    turn_note = FONTOBJ.render("Player %s, it's your turn" % game.current_turn, True, white, tblack)
-    DISPLAY_SURF.blit(turn_note, turn_note.get_rect())
+    message("Player %s, it's your turn" % game.current_turn)
     pygame.display.flip()
     clock.tick(60)
