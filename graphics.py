@@ -69,11 +69,10 @@ while True:
         if event.type == pygame.MOUSEBUTTONUP:
             for tile in board:
                 if tile.is_clicked():
-                    tile.value = game.players[game.current_turn].symbol
-                    if board.has_three_in_a_row():
-                        #print 'game over, player %d won' % game.current_turn
-                        exit('game over, player %d won' % game.current_turn)
-                    game.next()
+                    if tile.toggle(game.players[game.current_turn].symbol):
+                        if board.has_three_in_a_row():
+                            exit('game over, player %d won' % game.current_turn)
+                        game.next_player_turn()
     DISPLAY_SURF.fill(black)
     for tile in board:
         tile.draw()

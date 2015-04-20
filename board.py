@@ -22,10 +22,14 @@ class Square(object):
             return (self.x, self.y) == other
 
     def toggle(self, symbol):
+        """toggles state of symbol (if empty)
+        returns True, if tile is occupied, returns false"""
         if self.value is None:
             self.value = symbol
-        else:
-            raise AttributeError, 'square has already been assigned!'
+            return True
+        return False
+        #else:
+            #raise AttributeError, 'square has already been assigned!'
 
 
 
