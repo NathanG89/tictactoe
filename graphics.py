@@ -12,7 +12,7 @@ WIDTH, HEIGHT = 640, 640
 SIZE = 3
 DISPLAY_SURF = pygame.display.set_mode((WIDTH,HEIGHT))
 
-FONTOBJ = pygame.font.Font('lato.ttf', 48)
+FONTOBJ = pygame.font.SysFont('Sans', 48, False, False)#('lato.ttf', 48)
 
 #players = Player(0, 'X'), Player(1, 'O'), Player(2, 'W'), Player(3, 'H')
 players = Player(0, 'X'), Player(1, 'O')
@@ -21,7 +21,7 @@ white = 204, 204, 204
 black = 54, 54, 54 
 tblack = 54, 54, 54, 128
 
-def random_color():
+def random_color(): #returns a tuple of randomly generated integers for rgb functions
     return randint(1, 192), randint(1, 192), randint(1, 192)
 
 class Tile(Square):
@@ -50,13 +50,25 @@ def message(s):
     msg = FONTOBJ.render(s, True, white, black)
     DISPLAY_SURF.blit(msg, msg.get_rect())
 
-def exit(s):
+def gameexit(s, delay):
+    cd = 3 #holds the count down timer value
+    for tile in board: #loop that redraws the current state of the board to clear out previous messages
+        tile.draw()
+    message(s) #prints message from the argument variable to the display
+    pygame.display.update() #updates the display
+    sleep(delay)
+    s = 'Closing game...'
     for tile in board:
         tile.draw()
-    message(s)
+    message(s) #prints message to the display
     pygame.display.update()
-    sleep(3)
-    sysexit()
+    while cd != 0: #while loop counts down to program closing
+        message(s + str(cd))
+        pygame.display.update()
+        sleep(1)
+        cd -= 1; #count down variable decreased until while loop condition is met
+    pygame.quit() #close pygame modules
+    sysexit() #closes program
 
 board = create_graphic_board(SIZE)
 clock = pygame.time.Clock()
@@ -65,14 +77,16 @@ game = Game(players)
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            exit()
+            gameexit('Closing game...', 1)
         if event.type == pygame.MOUSEBUTTONUP:
             for tile in board:
                 if tile.is_clicked():
                     if tile.toggle(game.players[game.current_turn].symbol):
-                        if board.has_three_in_a_row():
-                            exit('game over, player %d won' % game.current_turn)
-                        game.next_player_turn()
+                        game.next()
+                    if board.has_three_in_a_row():
+                        #sleep(4) #adds a delay before the next message
+                        gameexit('game over, player %d won!' % game.current_turn, 4)
+                    #game.next()
     DISPLAY_SURF.fill(black)
     for tile in board:
         tile.draw()
