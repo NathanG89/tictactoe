@@ -47,24 +47,20 @@ def create_graphic_board(size=SIZE):
     return Grid([Column([Tile(DISPLAY_SURF, x,y) for y in range(size)]) for x in range(size)])
 
 def message(s):
+    for tile in board: #loop that redraws the current state of the board to clear out previous messages
+        tile.draw()
     msg = FONTOBJ.render(s, True, white, black)
     DISPLAY_SURF.blit(msg, msg.get_rect())
+    pygame.display.update() #updates the display
 
 def gameexit(s, delay):
     cd = 3 #holds the count down timer value
-    for tile in board: #loop that redraws the current state of the board to clear out previous messages
-        tile.draw()
     message(s) #prints message from the argument variable to the display
-    pygame.display.update() #updates the display
     sleep(delay)
     s = 'Closing game...'
-    for tile in board:
-        tile.draw()
     message(s) #prints message to the display
-    pygame.display.update()
     while cd != 0: #while loop counts down to program closing
         message(s + str(cd))
-        pygame.display.update()
         sleep(1)
         cd -= 1; #count down variable decreased until while loop condition is met
     pygame.quit() #close pygame modules
@@ -82,14 +78,12 @@ while True:
             for tile in board:
                 if tile.is_clicked():
                     if tile.toggle(game.players[game.current_turn].symbol):
-                        game.next()
+                        game.next_player_turn()
                     if board.has_three_in_a_row():
                         #sleep(4) #adds a delay before the next message
                         gameexit('game over, player %d won!' % game.current_turn, 4)
                     #game.next()
     DISPLAY_SURF.fill(black)
-    for tile in board:
-        tile.draw()
     message("Player %s, it's your turn" % game.current_turn)
     pygame.display.flip()
     clock.tick(60)
