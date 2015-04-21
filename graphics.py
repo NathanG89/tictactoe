@@ -46,21 +46,51 @@ class Tile(Square):
 def create_graphic_board(size=SIZE):
     return Grid([Column([Tile(DISPLAY_SURF, x,y) for y in range(size)]) for x in range(size)])
 
-def message(s):
+"""takes a required argument 's' containing a string, and an optional 
+keyword argument 'coords' containing a dictionary of keywords accepted by the 
+pygame Rect function"""
+
+def message(s, coords={"left": 0,"top": 0}):
     for tile in board: #loop that redraws the current state of the board to clear out previous messages
         tile.draw()
     msg = FONTOBJ.render(s, True, white, black)
-    DISPLAY_SURF.blit(msg, msg.get_rect())
+    DISPLAY_SURF.blit(msg, msg.get_rect(**coords))
     pygame.display.update() #updates the display
+    
+"""Button class.  Initializes each instance with text passed in the argument
+'text' and the coordinates from the passed keyword argument 'coords'.
+If the coordinates are not passed as a keyword argument, then the default is
+set to the center of the screen.  A function is also passed to the 'action'
+argument that the button class uses to run a function when clicked"""
+
+"""The 'coords' keyword accepts a dictionary of keywords used by the pygame
+Rect function, which is then passed as a set of keywords in and of itself."""    
+    
+class Button(object):
+    def __init__(self, text, action, coords={'centerx': 0, 'centery': 0}):
+        self.text = text
+        self.coords = coords
+        self.button = FONTOBJ.render(self.text, True, black, white)
+        self.action = action
+        
+    def draw(self):
+        DISPLAY_SURF.blit(self.button, self.button.get_rect(**self.coords))
+        
+    def is_clicked(self):
+        x,y = pygame.mouse.get_pos()
+        return self.button.get_rect().collidepoint(x,y)
+    
+    def run(self):
+        self.action
 
 def gameexit(s, delay):
     cd = 3 #holds the count down timer value
     message(s) #prints message from the argument variable to the display
     sleep(delay)
     s = 'Closing game...'
-    message(s) #prints message to the display
+    message(s, coords={"centerx": WIDTH/2, "centery": HEIGHT/2}) #prints message to the display
     while cd != 0: #while loop counts down to program closing
-        message(s + str(cd))
+        message(s + str(cd), coords={"centerx": WIDTH/2, "centery": HEIGHT/2})
         sleep(1)
         cd -= 1; #count down variable decreased until while loop condition is met
     pygame.quit() #close pygame modules
@@ -69,6 +99,7 @@ def gameexit(s, delay):
 board = create_graphic_board(SIZE)
 clock = pygame.time.Clock()
 game = Game(players)
+buttons = [singleBtn("single"), multiBtn("multiplayer"), retryBtn("Play Again?"), closeBtn("Quit")]
 
 while True:
     for event in pygame.event.get():
@@ -83,7 +114,11 @@ while True:
                         #sleep(4) #adds a delay before the next message
                         gameexit('game over, player %d won!' % game.current_turn, 4)
                     #game.next()
+            for button in buttons:
+                if button.is_clicked():
+                    button.run()
     DISPLAY_SURF.fill(black)
+        
     message("Player %s, it's your turn" % game.current_turn)
     pygame.display.flip()
     clock.tick(60)
