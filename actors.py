@@ -28,7 +28,7 @@ class Game(object):
                 self.ids += 1
         self.players[0].toggle_turn()
 
-    def next_player_turn(self):
+    def next_player_turn(self): #Sets current player turn to false and nex player turn to true
         self.players[self.current_turn].toggle_turn()
         self.current_turn = (self.current_turn + 1) % len(self.players)
         self.players[self.current_turn].toggle_turn()

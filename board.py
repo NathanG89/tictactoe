@@ -28,8 +28,6 @@ class Square(object):
             self.value = symbol
             return True
         return False
-        #else:
-            #raise AttributeError, 'square has already been assigned!'
 
 
 
