@@ -99,7 +99,7 @@ def gameexit(s, delay):
 board = create_graphic_board(SIZE)
 clock = pygame.time.Clock()
 game = Game(players)
-buttons = [singleBtn("single"), multiBtn("multiplayer"), retryBtn("Play Again?"), closeBtn("Quit")]
+buttons = [singleBtn("single player"), multiBtn("multi-player"), retryBtn("Play Again"), closeBtn("Quit")]
 
 while True:
     for event in pygame.event.get():
