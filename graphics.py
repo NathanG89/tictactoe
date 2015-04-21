@@ -76,7 +76,7 @@ class Button(object):
     def draw(self):
         DISPLAY_SURF.blit(self.button, self.button.get_rect(**self.coords))
         
-    def is_clicked(self):
+    def is_clicked(self): #checks to see if the button was clicked
         x,y = pygame.mouse.get_pos()
         return self.button.get_rect().collidepoint(x,y)
     
