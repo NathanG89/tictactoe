@@ -31,7 +31,6 @@ class Tile(Square):
         self.rect = pygame.Rect(self.x * b_size, self.y * b_size, b_size, b_size)
         self.surface = pygame.Surface((b_size, b_size))
         self.surface.fill(random_color())
-        #self.display = kwargs.get('display')
         self.display = display
 
     def draw(self):
@@ -111,9 +110,7 @@ while True:
                     if tile.toggle(game.players[game.current_turn].symbol):
                         game.next_player_turn()
                     if board.has_three_in_a_row():
-                        #sleep(4) #adds a delay before the next message
                         gameexit('game over, player %d won!' % game.current_turn, 4)
-                    #game.next()
             for button in buttons:
                 if button.is_clicked():
                     button.run()
