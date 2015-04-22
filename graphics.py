@@ -69,8 +69,11 @@ class Button(object):
     def __init__(self, text, action, coords={'centerx': 0, 'centery': 0}):
         self.text = text
         self.coords = coords
-        self.button = FONTOBJ.render(self.text, True, black, white)
         self.action = action
+        if action is None:
+            self.button = FONTOBJ.render(self.text, True, black, grey)
+        else:
+            self.button = FONTOBJ.render(self.text, True, black, white)
         
     def draw(self):
         DISPLAY_SURF.blit(self.button, self.button.get_rect(**self.coords))
@@ -98,7 +101,7 @@ def gameexit(s, delay):
 board = create_graphic_board(SIZE)
 clock = pygame.time.Clock()
 game = Game(players)
-buttons = [singleBtn("single player"), multiBtn("multi-player"), retryBtn("Play Again"), closeBtn("Quit")]
+buttons = [singleBtn("Single Player"), multiBtn("Multiplayer")]
 
 while True:
     for event in pygame.event.get():

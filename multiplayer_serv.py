@@ -4,7 +4,7 @@ Created on Apr 20, 2015
 @author: Nate
 '''
 
-class MyClass(object):
+class MultiplayerServer(object):
     '''
     classdocs
     '''
