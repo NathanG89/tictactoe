@@ -66,7 +66,7 @@ argument that the button class uses to run a function when clicked"""
 Rect function, which is then passed as a set of keywords in and of itself."""    
     
 class Button(object):
-    def __init__(self, text, action, coords={'centerx': 0, 'centery': 0}):
+    def __init__(self, text, action=None, coords={'centerx': 0, 'centery': 0}):
         self.text = text
         self.coords = coords
         self.action = action
@@ -74,6 +74,28 @@ class Button(object):
             self.button = FONTOBJ.render(self.text, True, black, grey)
         else:
             self.button = FONTOBJ.render(self.text, True, black, white)
+    
+    def set_action(self, action):
+        if action is None:
+            self.button = FONTOBJ.render(self.text, True, black, grey)
+        else:
+            self.button = FONTOBJ.render(self.text, True, black, white)
+        self.action = action
+    
+    def get_action(self):
+        return self.action
+    
+    def set_text(self, text):
+        self.text = text
+    
+    def get_text(self):
+        return self.text
+    
+    def set_coords(self, coords={'centerx': 0, 'centery': 0}):
+        self.coords = coords
+        
+    def get_coords(self):
+        return self.coords
         
     def draw(self):
         DISPLAY_SURF.blit(self.button, self.button.get_rect(**self.coords))
@@ -101,7 +123,8 @@ def gameexit(s, delay):
 board = create_graphic_board(SIZE)
 clock = pygame.time.Clock()
 game = Game(players)
-buttons = [singleBtn("Single Player"), multiBtn("Multiplayer")]
+buttons = {'single':singleBtn("Single Player",coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)+15}), 
+           'multi':multiBtn("Multiplayer",coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)-15})}
 
 while True:
     for event in pygame.event.get():
@@ -118,7 +141,8 @@ while True:
                 if button.is_clicked():
                     button.run()
     DISPLAY_SURF.fill(black)
-        
+    button['single'].draw()
+    button['multi'].draw()
     message("Player %s, it's your turn" % game.current_turn)
     pygame.display.flip()
     clock.tick(60)
