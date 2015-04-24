@@ -20,6 +20,7 @@ players = Player(0, 'X'), Player(1, 'O')
 white = 204, 204, 204
 black = 54, 54, 54 
 tblack = 54, 54, 54, 128
+gray = 128, 128, 128
 
 def random_color(): #returns a tuple of randomly generated integers for rgb functions
     return randint(1, 192), randint(1, 192), randint(1, 192)
@@ -71,13 +72,13 @@ class Button(object):
         self.coords = coords
         self.action = action
         if action is None:
-            self.button = FONTOBJ.render(self.text, True, black, grey)
+            self.button = FONTOBJ.render(self.text, True, black, gray)
         else:
             self.button = FONTOBJ.render(self.text, True, black, white)
     
-    def set_action(self, action):
+    def set_action(self, action=None):
         if action is None:
-            self.button = FONTOBJ.render(self.text, True, black, grey)
+            self.button = FONTOBJ.render(self.text, True, black, gray)
         else:
             self.button = FONTOBJ.render(self.text, True, black, white)
         self.action = action
@@ -99,6 +100,7 @@ class Button(object):
         
     def draw(self):
         DISPLAY_SURF.blit(self.button, self.button.get_rect(**self.coords))
+        pygame.display.update()
         
     def is_clicked(self): #checks to see if the button was clicked
         x,y = pygame.mouse.get_pos()
@@ -120,11 +122,13 @@ def gameexit(s, delay):
     pygame.quit() #close pygame modules
     sysexit() #closes program
 
+buttons = {'single':Button("Single Player",coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)+30}), 
+           'multi':Button("Multiplayer",coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)-30})}
+buttons['single'].draw()
+buttons['multi'].draw()
 board = create_graphic_board(SIZE)
 clock = pygame.time.Clock()
 game = Game(players)
-buttons = {'single':singleBtn("Single Player",coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)+15}), 
-           'multi':multiBtn("Multiplayer",coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)-15})}
 
 while True:
     for event in pygame.event.get():
@@ -138,11 +142,9 @@ while True:
                     if board.has_three_in_a_row():
                         gameexit('game over, player %d won!' % game.current_turn, 4)
             for button in buttons:
-                if button.is_clicked():
-                    button.run()
+                if buttons[button].is_clicked():
+                    buttons[button].run()
     DISPLAY_SURF.fill(black)
-    button['single'].draw()
-    button['multi'].draw()
     message("Player %s, it's your turn" % game.current_turn)
     pygame.display.flip()
     clock.tick(60)
