@@ -73,26 +73,28 @@ Rect function, which is then passed as a set of keywords in and of itself.
 ~Nate"""    
     
 class Button(object):
-    def __init__(self, args, text="button", action=None, coords={'centerx': 0, 'centery': 0}):
+    def __init__(self, args=None, kwargs=None, text="button", action=None, coords={'centerx': 0, 'centery': 0}):
         self.text = text
         self.coords = coords
         self.action = action
         self.args = args
+        self.kwargs = kwargs
         if action is None:
             self.button = FONTOBJ.render(self.text, True, black, gray)
         else:
             self.button = FONTOBJ.render(self.text, True, black, white)
     
-    def set_action(self, action=None, args):
+    def set_action(self, args=None, kwargs=None, action=None):
         if action is None:
             self.button = FONTOBJ.render(self.text, True, black, gray)
         else:
             self.button = FONTOBJ.render(self.text, True, black, white)
         self.action = action
         self.args = args
+        self.kwargs = kwargs
     
     def get_action(self):
-        return self.action
+        return self.action, self.args, self.kwargs
     
     def set_text(self, text):
         self.text = text
@@ -117,7 +119,14 @@ class Button(object):
         return self.button.get_rect().collidepoint(x,y)
     
     def run(self):
-        self.action(*self.args)
+        if self.args == None and self.kwargs == None:
+            self.action()
+        elif not self.args == None and self.kwargs == None:
+            self.action(*self.args)
+        elif self.args == None and not self.kwargs == None:
+            self.action(**self.kwargs)
+        else:
+            self.action(*self.args, **self.kwargs)
         
 """method that renders messages to the display surface before closing the program.
 
