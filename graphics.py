@@ -73,60 +73,39 @@ Rect function, which is then passed as a set of keywords in and of itself.
 ~Nate"""    
     
 class Button(object):
-    def __init__(self, args=None, kwargs=None, text="button", action=None, coords={'centerx': 0, 'centery': 0}):
+    def __init__(self, text="", disabled=True, coords={'centerx': 0, 'centery': 0}):
         self.text = text
         self.coords = coords
-        self.action = action
-        self.args = args
-        self.kwargs = kwargs
-        if action is None:
+        if disabled == True:
             self.button = FONTOBJ.render(self.text, True, black, gray)
         else:
             self.button = FONTOBJ.render(self.text, True, black, white)
     
-    def set_action(self, args=None, kwargs=None, action=None):
-        if action is None:
-            self.button = FONTOBJ.render(self.text, True, black, gray)
-        else:
-            self.button = FONTOBJ.render(self.text, True, black, white)
-        self.action = action
-        self.args = args
-        self.kwargs = kwargs
-    
-    def get_action(self):
-        return self.action, self.args, self.kwargs
-    
-    def set_text(self, text):
-        self.text = text
-    
-    def get_text(self):
-        return self.text
-    
-    def set_coords(self, coords={'centerx': 0, 'centery': 0}):
-        self.coords = coords
-        
-    def get_coords(self):
-        return self.coords
+#    def set_action(self, args=None, kwargs=None, action=None):
+#        if action is None:
+#            self.button = FONTOBJ.render(self.text, True, black, gray)
+#        else:
+#            self.button = FONTOBJ.render(self.text, True, black, white)
+#        self.action = action
+#        self.args = args
+#        self.kwargs = kwargs
         
     def draw(self):
-        #for tile in board: #loop that redraws the current state of the board to clear out previous messages
-            #tile.draw()
         DISPLAY_SURF.blit(self.button, self.button.get_rect(**self.coords))
-        #pygame.display.update()
         
     def is_clicked(self): #checks to see if the button was clicked
         x,y = pygame.mouse.get_pos()
         return self.button.get_rect().collidepoint(x,y)
     
-    def run(self):
-        if self.args == None and self.kwargs == None:
-            self.action()
-        elif not self.args == None and self.kwargs == None:
-            self.action(*self.args)
-        elif self.args == None and not self.kwargs == None:
-            self.action(**self.kwargs)
-        else:
-            self.action(*self.args, **self.kwargs)
+#    def run(self):
+#        if self.args == None and self.kwargs == None:
+#            self.action()
+#        elif not self.args == None and self.kwargs == None:
+#            self.action(*self.args)
+#        elif self.args == None and not self.kwargs == None:
+#            self.action(**self.kwargs)
+#        else:
+#            self.action(*self.args, **self.kwargs)
         
 """method that renders messages to the display surface before closing the program.
 
@@ -158,19 +137,24 @@ def gameexit(info, coords={"left":0,"right":0}):
     pygame.quit() #close pygame modules
     sysexit() #closes program
     
+"""method runs before the main loop and displays 2 buttons that allow the player
+to choose whether they are playing alone or with a friend on the same machine
+or over a network."""
+    
 def mode():
     mode = None
-    modeButtons = {'single':Button("Single Player",action=redraw_board,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)+30}), 
-           'multi':Button("Multiplayer",action=redraw_board,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)-30})}
+    modeButtons = {'single':Button(text="Single Player",action=redraw_board,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)-30}), 
+           'multi':Button(text="Multiplayer",action=redraw_board,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)+30})}
     DISPLAY_SURF.fill(black)
     redraw_board()
-    modeButtons['single'].draw()
     modeButtons['multi'].draw()
+    modeButtons['single'].draw()
     pygame.display.flip()
     while mode == None:
         for button in modeButtons:
             if modeButtons[button].is_clicked():
                 mode = button
+                modeButtons[button].run()
     return mode        
 
 buttons = {}
