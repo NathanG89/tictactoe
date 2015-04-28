@@ -51,7 +51,7 @@ def redraw_board():
         tile.draw()
 
 """takes a required argument 's' containing a string, and an optional 
-keyword argument 'coords' containing a dictionary of keywords accepted by the 
+keyword argument 'coordsBtn' containing a dictionary of keywords accepted by the 
 pygame Rect function"""
 
 def message(s, coords={"left": 0,"top": 0}):
@@ -61,41 +61,52 @@ def message(s, coords={"left": 0,"top": 0}):
     DISPLAY_SURF.blit(msg, msg.get_rect(**coords))
     #pygame.display.update() #updates the display
     
-"""Button class.  Initializes each instance with text passed in the argument
-'text' and the coordinates from the passed keyword argument 'coords'.
+"""Button class.  Initializes each instance with textBtn passed in the argument
+'textBtn' and the coordinates from the passed keyword argument 'coordsBtn'.
 If the coordinates are not passed as a keyword argument, then the default is
 set to the center of the screen.  A function is also passed to the 'action'
 argument that the button class uses to run a function when clicked"""
 
-"""The 'coords' keyword accepts a dictionary of keywords used by the pygame
+"""The 'coordsBtn' keyword accepts a dictionary of keywords used by the pygame
 Rect function, which is then passed as a set of keywords in and of itself.
 
 ~Nate"""    
     
 class Button(object):
-    def __init__(self, text="", disabled=True, coords={'centerx': 0, 'centery': 0}):
-        self.text = text
-        self.coords = coords
-        if disabled == True:
-            self.button = FONTOBJ.render(self.text, True, black, gray)
+    def __init__(self, text="Button", disabled=True, coords={'centerx': 0, 'centery': 0}):
+        self.textBtn = text
+        self.coordsBtn = coords
+        self.disabledBtn = disabled
+        if self.disabledBtn == True:
+            self.button = FONTOBJ.render(self.textBtn, True, black, gray)
         else:
-            self.button = FONTOBJ.render(self.text, True, black, white)
+            self.button = FONTOBJ.render(self.textBtn, True, black, white)
+    
+#    @setter
+#    def disabledBtn(self):
+#        if self.disabledBtn == True:
+#            self.button = FONTOBJ.render(self.textBtn, True, black, gray)
+#        else:
+#            self.button = FONTOBJ.render(self.textBtn, True, black, white)
     
 #    def set_action(self, args=None, kwargs=None, action=None):
 #        if action is None:
-#            self.button = FONTOBJ.render(self.text, True, black, gray)
+#            self.button = FONTOBJ.render(self.textBtn, True, black, gray)
 #        else:
-#            self.button = FONTOBJ.render(self.text, True, black, white)
+#            self.button = FONTOBJ.render(self.textBtn, True, black, white)
 #        self.action = action
 #        self.args = args
 #        self.kwargs = kwargs
         
     def draw(self):
-        DISPLAY_SURF.blit(self.button, self.button.get_rect(**self.coords))
+        DISPLAY_SURF.blit(self.button, self.button.get_rect(**self.coordsBtn))
         
     def is_clicked(self): #checks to see if the button was clicked
         x,y = pygame.mouse.get_pos()
-        return self.button.get_rect().collidepoint(x,y)
+        if self.disabledBtn == False:
+            return self.button.get_rect().collidepoint(x,y)
+        else:
+            return False
     
 #    def run(self):
 #        if self.args == None and self.kwargs == None:
@@ -113,7 +124,7 @@ messages are passed to the method as an array of tuples, where the first
 item in the tuple is the string message and the second is the amount of delay
 set before the next message can be rendered.
 
-the coords keyword sets where the messages will be displayed in relation to 
+the coordsBtn keyword sets where the messages will be displayed in relation to 
 the display surface.  At this time I have only implemented passing 1 set of 
 coordinates, so all the messages will display in one location.  the closing
 message is set to displayin the center by default.
@@ -143,8 +154,8 @@ or over a network."""
     
 def mode():
     mode = None
-    modeButtons = {'single':Button(text="Single Player",action=redraw_board,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)-30}), 
-           'multi':Button(text="Multiplayer",action=redraw_board,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)+30})}
+    modeButtons = {'single':Button(text="Single Player",disabled=False,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)-30}), 
+           'multi':Button(text="Multiplayer",disabled=False,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)+30})}
     DISPLAY_SURF.fill(black)
     redraw_board()
     modeButtons['multi'].draw()
@@ -154,7 +165,8 @@ def mode():
         for button in modeButtons:
             if modeButtons[button].is_clicked():
                 mode = button
-                modeButtons[button].run()
+                #modeButtons[button].run()
+    redraw_board()
     return mode        
 
 buttons = {}
