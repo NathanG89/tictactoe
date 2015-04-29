@@ -82,12 +82,13 @@ class Button(object):
         else:
             self.button = FONTOBJ.render(self.textBtn, True, black, white)
     
-#    @setter
-#    def disabledBtn(self):
-#        if self.disabledBtn == True:
-#            self.button = FONTOBJ.render(self.textBtn, True, black, gray)
-#        else:
-#            self.button = FONTOBJ.render(self.textBtn, True, black, white)
+    @disabledBtn.setter
+    def disabledBtn(self, disabled):
+        self.disabledBtn = disabled
+        if self.disabledBtn == True:
+            self.button = FONTOBJ.render(self.textBtn, True, black, gray)
+        else:
+            self.button = FONTOBJ.render(self.textBtn, True, black, white)
     
 #    def set_action(self, args=None, kwargs=None, action=None):
 #        if action is None:
@@ -101,11 +102,11 @@ class Button(object):
     def draw(self):
         DISPLAY_SURF.blit(self.button, self.button.get_rect(**self.coordsBtn))
         
-    def is_clicked(self): #checks to see if the button was clicked
+    def is_clicked(self, buttons): #checks to see if the button was clicked
         x,y = pygame.mouse.get_pos()
-        if self.disabledBtn == False:
-            return self.button.get_rect().collidepoint(x,y)
-        else:
+        for button in buttons:
+            if buttons[button].rect.collidepoint(x,y):
+                return True
             return False
     
 #    def run(self):
@@ -189,9 +190,7 @@ while True:
                         game.next_player_turn()
                     if board.has_three_in_a_row():
                         gameexit([('game over, player %d won!' % game.current_turn, 4)])
-            for button in buttons:
-                if buttons[button].is_clicked():
-                    buttons[button].run()
+            buttons.is_clicked(buttons)
     DISPLAY_SURF.fill(black)
     redraw_board()
     message("Player %s, it's your turn" % game.current_turn)
