@@ -5,6 +5,7 @@ from time import sleep
 from random import randint
 from board import Square, Grid, Column
 from actors import Player, Game
+from menu import Menu, Button, Messenger
 
 pygame.init()
 
@@ -49,17 +50,48 @@ def create_graphic_board(size=SIZE):
 def redraw_board():
     for tile in board: #loop that redraws the current state of the board to clear out previous messages
         tile.draw()
+        
+
 
 """takes a required argument 's' containing a string, and an optional 
 keyword argument 'coordsBtn' containing a dictionary of keywords accepted by the 
 pygame Rect function"""
 
-def message(s, coords={"left": 0,"top": 0}):
-    #for tile in board: #loop that redraws the current state of the board to clear out previous messages
-        #tile.draw()
-    msg = FONTOBJ.render(s, True, white, black)
-    DISPLAY_SURF.blit(msg, msg.get_rect(**coords))
-    #pygame.display.update() #updates the display
+def message(s, coords=(0,0)):
+    messenger.offset = coords
+    messenger.draw(DISPLAY_SURF)
+    
+def create_menu(buttons):
+    menu = Menu()
+    #buttons = [('quit', sysexit),
+    #           ('goodbye', lambda: message),
+    #           ('filler option', sysexit),
+    #           ('return [doesn\'t work]', sysexit),]
+    for i, args in enumerate(buttons):
+        b = Button((16,i*FONTSIZE),(0,0),*args)
+        menu.buttons.add(b)
+    return menu
+
+
+def intro_menu(s, buttons):
+    """need to have the rest of the game features
+    freeze besides menu components"""
+    messenger.message = s
+    messenger.offset = 32, len(menu.buttons) * 64
+    menu = create_menu(buttons)
+
+    while True:
+        DISPLAY_SURF.fill(black)
+        redraw_board()
+        menu.draw(DISPLAY_SURF)
+        messenger.draw(DISPLAY_SURF)
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONUP:
+                if menu.check_clicked(pygame.mouse.get_pos()):
+                    menu.action()
+                    break
+        pygame.display.update()
+        clock.tick(FPS)
     
 """Button class.  Initializes each instance with textBtn passed in the argument
 'textBtn' and the coordinates from the passed keyword argument 'coordsBtn'.
@@ -70,9 +102,13 @@ argument that the button class uses to run a function when clicked"""
 """The 'coordsBtn' keyword accepts a dictionary of keywords used by the pygame
 Rect function, which is then passed as a set of keywords in and of itself.
 
-~Nate"""    
+~Nate
+
+Recent update made by James: 4/29/15"""    
+
+
     
-class Button(object):
+"""class Button(object):
     def __init__(self, text="Button", disabled=True, coords={'centerx': 0, 'centery': 0}):
         self.textBtn = text
         self.coordsBtn = coords
@@ -117,7 +153,7 @@ class Button(object):
 #        elif self.args == None and not self.kwargs == None:
 #            self.action(**self.kwargs)
 #        else:
-#            self.action(*self.args, **self.kwargs)
+#            self.action(*self.args, **self.kwargs)"""
         
 """method that renders messages to the display surface before closing the program.
 
@@ -153,7 +189,7 @@ def gameexit(info, coords={"left":0,"right":0}):
 to choose whether they are playing alone or with a friend on the same machine
 or over a network."""
     
-def mode():
+"""def mode():
     mode = None
     modeButtons = {'single':Button(text="Single Player",disabled=False,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)-30}), 
            'multi':Button(text="Multiplayer",disabled=False,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)+30})}
@@ -168,16 +204,16 @@ def mode():
                 mode = button
                 #modeButtons[button].run()
     redraw_board()
-    return mode        
+    return mode"""        
 
-buttons = {}
+buttons = [('Single Player', redraw_board),
+           ('Multi-Player', redraw_board),
+           ('Quit', gameexit)]
 board = create_graphic_board(SIZE)
 clock = pygame.time.Clock()
 game = Game(players)
-mode = mode()
-text = 'Currently playing in ' + mode  + ' player mode'
-message(text, coords)
-sleep(4)
+messenger = Messenger()
+intro_menu()
 
 while True:
     for event in pygame.event.get():
@@ -193,7 +229,8 @@ while True:
             buttons.is_clicked(buttons)
     DISPLAY_SURF.fill(black)
     redraw_board()
-    message("Player %s, it's your turn" % game.current_turn)
+    messenger.message = "Player %s, it's your turn" % game.current_turn
+    messenger.draw(DISPLAY_SURF)
     #pygame.display.update()
     pygame.display.flip()
     clock.tick(60)
