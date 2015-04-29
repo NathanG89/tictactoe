@@ -72,13 +72,22 @@ def create_menu(buttons):
         menu.buttons.add(b)
     return menu
 
+"""method runs before the main loop and displays 3 buttons that allow the player
+to choose whether they are playing alone, with a friend on the same machine
+or over a network, or exit the game."""   
 
-def intro_menu(s, buttons):
+def intro_menu(s):
     """need to have the rest of the game features
     freeze besides menu components"""
     messenger.message = s
     messenger.offset = 32, len(menu.buttons) * 64
+    buttons = [('Single Player', single_player),
+               ('Multi-Player', single_player),
+               ('Quit', gameexit)]
     menu = create_menu(buttons)
+    board = create_graphic_board(SIZE)
+    clock = pygame.time.Clock()
+    game = Game(players)
 
     while True:
         DISPLAY_SURF.fill(black)
@@ -89,71 +98,31 @@ def intro_menu(s, buttons):
             if event.type == pygame.MOUSEBUTTONUP:
                 if menu.check_clicked(pygame.mouse.get_pos()):
                     menu.action()
-                    break
         pygame.display.update()
-        clock.tick(FPS)
-    
-"""Button class.  Initializes each instance with textBtn passed in the argument
-'textBtn' and the coordinates from the passed keyword argument 'coordsBtn'.
-If the coordinates are not passed as a keyword argument, then the default is
-set to the center of the screen.  A function is also passed to the 'action'
-argument that the button class uses to run a function when clicked"""
-
-"""The 'coordsBtn' keyword accepts a dictionary of keywords used by the pygame
-Rect function, which is then passed as a set of keywords in and of itself.
-
-~Nate
-
-Recent update made by James: 4/29/15"""    
-
-
-    
-"""class Button(object):
-    def __init__(self, text="Button", disabled=True, coords={'centerx': 0, 'centery': 0}):
-        self.textBtn = text
-        self.coordsBtn = coords
-        self.disabledBtn = disabled
-        if self.disabledBtn == True:
-            self.button = FONTOBJ.render(self.textBtn, True, black, gray)
-        else:
-            self.button = FONTOBJ.render(self.textBtn, True, black, white)
-    
-    @disabledBtn.setter
-    def disabledBtn(self, disabled):
-        self.disabledBtn = disabled
-        if self.disabledBtn == True:
-            self.button = FONTOBJ.render(self.textBtn, True, black, gray)
-        else:
-            self.button = FONTOBJ.render(self.textBtn, True, black, white)
-    
-#    def set_action(self, args=None, kwargs=None, action=None):
-#        if action is None:
-#            self.button = FONTOBJ.render(self.textBtn, True, black, gray)
-#        else:
-#            self.button = FONTOBJ.render(self.textBtn, True, black, white)
-#        self.action = action
-#        self.args = args
-#        self.kwargs = kwargs
+        clock.tick(FPS)    
         
-    def draw(self):
-        DISPLAY_SURF.blit(self.button, self.button.get_rect(**self.coordsBtn))
+def single_player(s, buttons, game, board):
+    clock = pygame.time.Clock()
+    while True:
+        DISPLAY_SURF.fill(black)
+        redraw_board()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                gameexit([('Closing game...', 1)], coords={"centerx": WIDTH/2, "centery": HEIGHT/2})
+            if event.type == pygame.MOUSEBUTTONUP:
+                for tile in board:
+                    if tile.is_clicked():
+                        if tile.toggle(game.players[game.current_turn].symbol):
+                            game.next_player_turn()
+                        if board.has_three_in_a_row():
+                            gameexit([('game over, player %d won!' % game.current_turn, 4)])
+                buttons.is_clicked(buttons)
+        messenger.message = "Player %s, it's your turn" % game.current_turn
+        messenger.draw(DISPLAY_SURF)
+        #pygame.display.update()
+        pygame.display.flip()
+        clock.tick(60)
         
-    def is_clicked(self, buttons): #checks to see if the button was clicked
-        x,y = pygame.mouse.get_pos()
-        for button in buttons:
-            if buttons[button].rect.collidepoint(x,y):
-                return True
-            return False
-    
-#    def run(self):
-#        if self.args == None and self.kwargs == None:
-#            self.action()
-#        elif not self.args == None and self.kwargs == None:
-#            self.action(*self.args)
-#        elif self.args == None and not self.kwargs == None:
-#            self.action(**self.kwargs)
-#        else:
-#            self.action(*self.args, **self.kwargs)"""
         
 """method that renders messages to the display surface before closing the program.
 
@@ -183,39 +152,12 @@ def gameexit(info, coords={"left":0,"right":0}):
         cd -= 1; #count down variable decreased until while loop condition is met
         sleep(1)
     pygame.quit() #close pygame modules
-    sysexit() #closes program
-    
-"""method runs before the main loop and displays 2 buttons that allow the player
-to choose whether they are playing alone or with a friend on the same machine
-or over a network."""
-    
-"""def mode():
-    mode = None
-    modeButtons = {'single':Button(text="Single Player",disabled=False,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)-30}), 
-           'multi':Button(text="Multiplayer",disabled=False,coords={'centerx':WIDTH/2,'centery':(HEIGHT/2)+30})}
-    DISPLAY_SURF.fill(black)
-    redraw_board()
-    modeButtons['multi'].draw()
-    modeButtons['single'].draw()
-    pygame.display.flip()
-    while mode == None:
-        for button in modeButtons:
-            if modeButtons[button].is_clicked():
-                mode = button
-                #modeButtons[button].run()
-    redraw_board()
-    return mode"""        
+    sysexit() #closes program    
 
-buttons = [('Single Player', redraw_board),
-           ('Multi-Player', redraw_board),
-           ('Quit', gameexit)]
-board = create_graphic_board(SIZE)
-clock = pygame.time.Clock()
-game = Game(players)
 messenger = Messenger()
-intro_menu()
+intro_menu('Choose an option.')
 
-while True:
+"""while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             gameexit([('Closing game...', 1)], coords={"centerx": WIDTH/2, "centery": HEIGHT/2})
@@ -233,4 +175,4 @@ while True:
     messenger.draw(DISPLAY_SURF)
     #pygame.display.update()
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(60)"""

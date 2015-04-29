@@ -6,6 +6,12 @@ black = 54, 54, 54
 pygame.font.init()
 font = pygame.font.Font('lato.ttf', 32)
 
+"""Button class.  
+
+~Nate
+
+Recent update made by James: 4/29/15"""
+
 class Button(pygame.sprite.Sprite):
     def __init__(self, pos,offset=(0,0), text="", action=None):
         pygame.sprite.Sprite.__init__(self)
