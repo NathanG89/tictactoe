@@ -61,14 +61,14 @@ def message(s, coords=(0,0)):
     messenger.offset = coords
     messenger.draw(DISPLAY_SURF)
     
-def create_menu(buttons):
+def create_menu(buttons, offset=(0,0)):
     menu = Menu()
     #buttons = [('quit', sysexit),
     #           ('goodbye', lambda: message),
     #           ('filler option', sysexit),
     #           ('return [doesn\'t work]', sysexit),]
     for i, args in enumerate(buttons):
-        b = Button((16,i*FONTSIZE),(0,0),*args)
+        b = Button((16,i*FONTSIZE),offset,*args)
         menu.buttons.add(b)
     return menu
 
@@ -81,10 +81,11 @@ def intro_menu(s):
     freeze besides menu components"""
     messenger.message = s
     messenger.offset = 32, len(menu.buttons) * 64
+    singlePlayBtns = Button((HEIGHT-16,i*FONTSIZE),(0,0))
     buttons = [('Single Player', single_player),
                ('Multi-Player', single_player),
                ('Quit', gameexit)]
-    menu = create_menu(buttons)
+    menu = create_menu(buttons, (0,0))
     board = create_graphic_board(SIZE)
     clock = pygame.time.Clock()
     game = Game(players)
@@ -101,8 +102,9 @@ def intro_menu(s):
         pygame.display.update()
         clock.tick(FPS)    
         
-def single_player(s, buttons, game, board):
+def single_player(buttons, game, board):
     clock = pygame.time.Clock()
+    menu = create_menu(buttons)
     while True:
         DISPLAY_SURF.fill(black)
         redraw_board()
@@ -116,7 +118,8 @@ def single_player(s, buttons, game, board):
                             game.next_player_turn()
                         if board.has_three_in_a_row():
                             gameexit([('game over, player %d won!' % game.current_turn, 4)])
-                buttons.is_clicked(buttons)
+                if menu.check_clicked(pygame.mouse.get_pos()):
+                    menu.action()
         messenger.message = "Player %s, it's your turn" % game.current_turn
         messenger.draw(DISPLAY_SURF)
         #pygame.display.update()

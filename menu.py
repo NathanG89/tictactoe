@@ -13,7 +13,7 @@ font = pygame.font.Font('lato.ttf', 32)
 Recent update made by James: 4/29/15"""
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, pos,offset=(0,0), text="", action=None):
+    def __init__(self, pos,offset=(0,0), text="", action=None, args=None):
         pygame.sprite.Sprite.__init__(self)
         self.text = text
         self.image = font.render(text, True, white, black)
@@ -21,6 +21,7 @@ class Button(pygame.sprite.Sprite):
         x, y = offset
         self.rect = self.image.get_rect().move((x1 + x, y1 + y))
         self.action = self.original_action = action
+        self.args = args
         
     @property
     def enabled(self):
@@ -43,7 +44,10 @@ class Menu(object):
         self.buttons.draw(surface)
 
     def action(self):
-        self.active_button.action()
+        if self.active_button.args == None:
+            self.active_button.action()
+        else:
+            self.active_button.action(*self.active_button.args)
         self.active_button = None
 
     def check_clicked(self, pos):
