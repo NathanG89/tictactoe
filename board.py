@@ -29,8 +29,6 @@ class Square(object):
             return True
         return False
 
-
-
 class Column(object):
     def __init__(self, *args, **kwargs):
         size = kwargs.get('size')
@@ -80,7 +78,10 @@ class Grid(Column):
             symbols = set([item.value for item in diagonal])
             if len(symbols) == 1 and None not in symbols:
                 return True
-
+            
+    def reset(self):
+        for sq in self.items:
+            sq.value = None
 
 class Board(object):
     """Uses everything else so far to create a default board. Call
@@ -93,6 +94,7 @@ class Board(object):
                          [Column(
                                  [Square(x,y) for y in range(self.size)]
                          ) for x in range(self.size)])
+
 
 def create_board(size=3):
     """alternative to the board class, returns a grid default,
