@@ -13,7 +13,8 @@ WIDTH, HEIGHT = 640, 640
 SIZE = 3
 DISPLAY_SURF = pygame.display.set_mode((WIDTH,HEIGHT))
 
-FONTOBJ = pygame.font.SysFont('Sans', 48, False, False)#('lato.ttf', 48)
+FONTSIZE = 48
+FONTOBJ = pygame.font.SysFont('Sans', FONTSIZE, False, False)#('lato.ttf', 48)
 
 #players = Player(0, 'X'), Player(1, 'O'), Player(2, 'W'), Player(3, 'H')
 players = Player(0, 'X'), Player(1, 'O')
@@ -81,11 +82,11 @@ def intro_menu(s):
     freeze besides menu components"""
     messenger.message = s
     messenger.offset = 32, len(menu.buttons) * 64
-    singlePlayBtns = Button((HEIGHT-16,i*FONTSIZE),(0,0))
-    buttons = [('Single Player', single_player),
-               ('Multi-Player', single_player),
-               ('Quit', gameexit)]
-    menu = create_menu(buttons, (0,0))
+    #singlePlayBtns = Button((HEIGHT-16,i*FONTSIZE),(0,0))
+    buttons = [('Single Player', single_player, [game, board]),
+               ('Multi-Player', single_player, [game, board]),
+               ('Quit', gameexit, [('Closing game...',1),{'centerx':WIDTH/2,'centery':HEIGHT/2}])]
+    menu = create_menu(buttons, offset=(0,0))
     board = create_graphic_board(SIZE)
     clock = pygame.time.Clock()
     game = Game(players)
@@ -102,31 +103,36 @@ def intro_menu(s):
         pygame.display.update()
         clock.tick(FPS)    
         
-def single_player(buttons, game, board):
+def single_player(game, board):
     clock = pygame.time.Clock()
-    menu = create_menu(buttons)
+    buttons = [('Quit',gameexit,[('Closing game...',1),{'centerx':WIDTH/2,'centery':HEIGHT/2}])]
+    menu = create_menu(buttons, offset=(0,HEIGHT-FONTSIZE))
+    messenger.offset = 0,0
     while True:
         DISPLAY_SURF.fill(black)
         redraw_board()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                gameexit([('Closing game...', 1)], coords={"centerx": WIDTH/2, "centery": HEIGHT/2})
+                #gameexit([('Closing game...', 1)], coords={"centerx": WIDTH/2, "centery": HEIGHT/2})
+                continue
             if event.type == pygame.MOUSEBUTTONUP:
                 for tile in board:
                     if tile.is_clicked():
                         if tile.toggle(game.players[game.current_turn].symbol):
                             game.next_player_turn()
+                            messenger.message = "Player %s, it's your turn" % game.current_turn
+                            messenger.draw(DISPLAY_SURF)
                         if board.has_three_in_a_row():
-                            gameexit([('game over, player %d won!' % game.current_turn, 4)])
+                            #gameexit([('game over, player %d won!' % game.current_turn, 4)])
+                            continue
                 if menu.check_clicked(pygame.mouse.get_pos()):
                     menu.action()
-        messenger.message = "Player %s, it's your turn" % game.current_turn
-        messenger.draw(DISPLAY_SURF)
         #pygame.display.update()
         pygame.display.flip()
         clock.tick(60)
-        
-        
+    board.reset()
+    DISPLAY_SURF.fill(black)
+    redraw_board()
 """method that renders messages to the display surface before closing the program.
 
 messages are passed to the method as an array of tuples, where the first 
@@ -136,7 +142,7 @@ set before the next message can be rendered.
 the coordsBtn keyword sets where the messages will be displayed in relation to 
 the display surface.  At this time I have only implemented passing 1 set of 
 coordinates, so all the messages will display in one location.  the closing
-message is set to displayin the center by default.
+message is set to display in the center by default.
 
 ~Updates By: Nate
 ~Original Author: James"""

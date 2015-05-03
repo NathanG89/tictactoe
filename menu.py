@@ -52,7 +52,7 @@ class Menu(object):
 
     def check_clicked(self, pos):
         for button in self.buttons:
-            if button.rect.collidepoint(pos):
+            if button.rect.collidepoint(pos) and button.enabled:
                 self.active_button = button
                 return True
 
