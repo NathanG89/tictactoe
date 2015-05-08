@@ -27,6 +27,7 @@ class Game(object):
                 self.players.append(Player(self.ids))
                 self.ids += 1
         self.players[0].toggle_turn()
+        self.gameloop = False
 
     def next_player_turn(self): #Sets current player turn to false and nex player turn to true
         self.players[self.current_turn].toggle_turn()
@@ -34,3 +35,9 @@ class Game(object):
         self.players[self.current_turn].toggle_turn()
         assert self.players[self.current_turn].id == self.current_turn
         assert self.players[self.current_turn].is_my_turn()
+    
+    def toggle_gameloop(self):
+        if self.gameloop == False:
+            self.gameloop = True
+        else:
+            self.gameloop = False
