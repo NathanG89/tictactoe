@@ -13,7 +13,7 @@ font = pygame.font.Font('lato.ttf', 32)
 Recent update made by James: 4/29/15"""
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, pos,offset=(0,0), text="", action=None, args=None):
+    def __init__(self, pos, offset=(0,0), text="", action, args):
         pygame.sprite.Sprite.__init__(self)
         self.text = text
         self.image = font.render(text, True, white, black)

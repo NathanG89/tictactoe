@@ -90,22 +90,26 @@ def intro_menu(s):
     board = create_graphic_board(SIZE)
     clock = pygame.time.Clock()
     game = Game(players)
+    if game.gameloop == False:
+        game.toggle_gameloop()
 
     while True:
-        DISPLAY_SURF.fill(black)
-        redraw_board()
-        menu.draw(DISPLAY_SURF)
-        messenger.draw(DISPLAY_SURF)
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game.toggle_gameloop()
             if event.type == pygame.MOUSEBUTTONUP:
                 if menu.check_clicked(pygame.mouse.get_pos()):
                     menu.action()
+        menu.draw(DISPLAY_SURF)
+        messenger.draw(DISPLAY_SURF)
+        DISPLAY_SURF.fill(black)
+        redraw_board()
         pygame.display.update()
         clock.tick(FPS)    
         
 def single_player(game, board):
     clock = pygame.time.Clock()
-    buttons = [('Menu',game.toggle_gameloop),
+    buttons = [('Menu',game.toggle_gameloop, None),
                ('Quit',gameexit,[('Closing game...',1),{'centerx':WIDTH/2,'centery':HEIGHT/2}])]
     menu = create_menu(buttons, offset=(0,HEIGHT-FONTSIZE))
     messenger.offset = 0,0
@@ -125,9 +129,44 @@ def single_player(game, board):
                             #gameexit([('game over, player %d won!' % game.current_turn, 4)])
                             messenger.message = "game over, player %d won!" % game.current_turn
                             messenger.draw(DISPLAY_SURF)
-                            game.gameloop = False
+                            game.toggle_gameloop()
                             sleep(4)
-                            return
+                if menu.check_clicked(pygame.mouse.get_pos()):
+                    menu.action()
+        #pygame.display.update()
+        DISPLAY_SURF.fill(black)
+        redraw_board()
+        pygame.display.flip()
+        clock.tick(60)
+    board.reset()
+    DISPLAY_SURF.fill(black)
+    redraw_board()
+    
+def multi_player(game, board):
+    clock = pygame.time.Clock()
+    buttons = [('Menu',game.toggle_gameloop),
+               ('Quit',gameexit,[('Closing game...',1),{'centerx':WIDTH/2,'centery':HEIGHT/2}])]
+    menu = create_menu(buttons, offset=(0,FONTSIZE*buttons.len()))
+    messenger.offset = 0,0
+    if game.gameloop == False:
+        game.toggle_gameloop()
+    while game.gameloop:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                gameexit([('Closing game...', 1)], coords={"centerx": WIDTH/2, "centery": HEIGHT/2})
+            if event.type == pygame.MOUSEBUTTONUP:
+                for tile in board:
+                    if tile.is_clicked():
+                        if tile.toggle(game.players[game.current_turn].symbol):
+                            game.next_player_turn()
+                            messenger.message = "Player %s, it's your turn" % game.current_turn
+                            messenger.draw(DISPLAY_SURF)
+                        if board.has_three_in_a_row():
+                            #gameexit([('game over, player %d won!' % game.current_turn, 4)])
+                            messenger.message = "game over, player %d won!" % game.current_turn
+                            messenger.draw(DISPLAY_SURF)
+                            game.toggle_gameloop()
+                            sleep(4)
                 if menu.check_clicked(pygame.mouse.get_pos()):
                     menu.action()
         #pygame.display.update()
@@ -170,6 +209,7 @@ def gameexit(info, coords={"left":0,"right":0}):
 
 messenger = Messenger()
 intro_menu('Choose an option.')
+gameexit([('Closing game...', 1)], coords={"centerx": WIDTH/2, "centery": HEIGHT/2})
 
 """while True:
     for event in pygame.event.get():
