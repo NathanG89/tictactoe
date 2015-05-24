@@ -6,7 +6,6 @@ class NetEngine(object):
         self.ip_out, self.port_out = outgoing
         self.ip_in, self.port_in = incoming
         self.data = None
-
         self.create_sockets()
 
     def create_sockets(self):

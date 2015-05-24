@@ -4,7 +4,7 @@ white = 204, 204, 204
 black = 54, 54, 54 
 
 pygame.font.init()
-font = pygame.font.Font('lato.ttf', 32)
+font = pygame.font.SysFont('Sans', 48, False, False)#pygame.font.Font('lato.ttf', 32)
 
 """Button class.  
 
@@ -13,15 +13,15 @@ font = pygame.font.Font('lato.ttf', 32)
 Recent update made by James: 4/29/15"""
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, pos, offset=(0,0), text="", action, args):
+    def __init__(self, pos, offset=(0,0), *args):
         pygame.sprite.Sprite.__init__(self)
-        self.text = text
-        self.image = font.render(text, True, white, black)
+        self.text = args[0]
+        self.image = font.render(self.text, True, white, black)
         x1, y1 = pos
         x, y = offset
         self.rect = self.image.get_rect().move((x1 + x, y1 + y))
-        self.action = self.original_action = action
-        self.args = args
+        self.action = self.original_action = args[1]
+        self.args = args[2]
         
     @property
     def enabled(self):
@@ -55,6 +55,8 @@ class Menu(object):
             if button.rect.collidepoint(pos) and button.enabled:
                 self.active_button = button
                 return True
+            else:
+                return False
 
 class Messenger(pygame.sprite.Sprite):
     def __init__(self, msg=""):

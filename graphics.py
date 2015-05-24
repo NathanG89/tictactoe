@@ -69,7 +69,7 @@ def create_menu(buttons, offset=(0,0)):
     #           ('filler option', sysexit),
     #           ('return [doesn\'t work]', sysexit),]
     for i, args in enumerate(buttons):
-        b = Button((16,i*FONTSIZE),offset,*args)
+        b = Button((16,i*FONTSIZE),offset=offset,*args)
         menu.buttons.add(b)
     return menu
 
